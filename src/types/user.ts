@@ -9,9 +9,9 @@ export interface IUser {
 }
 
 export interface ICreateUserRequest {
-    fullName: string;
-    email: string;
-    password: string;
-    role: string;
-    status: string;
+    fullName?: string;
+    email?: string;
+    password?: string;
+    role?: string;
+    status?: string;
 }

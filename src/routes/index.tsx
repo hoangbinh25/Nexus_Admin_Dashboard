@@ -34,7 +34,15 @@ export const route = createBrowserRouter([
                         element: <UserManagement />,
                     },
                     {
+                        path: ERouter.DASHBOARD_USER_ID,
+                        element: <UserManagement />,
+                    },
+                    {
                         path: ERouter.DASHBOARD_CATEGORIES,
+                        element: <CategoryManagement />,
+                    },
+                    {
+                        path: ERouter.DASHBOARD_CATEGORY_ID,
                         element: <CategoryManagement />,
                     },
                     {

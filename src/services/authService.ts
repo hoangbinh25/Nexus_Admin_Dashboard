@@ -3,7 +3,7 @@ import api from "./api";
 
 export const loginAuth = async (data: IAuthRequest): Promise<IAuthResponse> => {
     const response = await api.post("auth/login", data);
-    console.log(response);
+    // console.log(response);
     return response.data;
 }
 

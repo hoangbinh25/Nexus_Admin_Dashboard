@@ -6,3 +6,8 @@ export interface ICategory {
     description: string;
     productCount: number;
 }
+
+export interface ICreateCategoryRequest {
+    name: string;
+    description: string;
+}
