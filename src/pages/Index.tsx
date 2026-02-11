@@ -1,8 +1,8 @@
 import { ERouter } from "@/enums/route";
-import { Navigate } from "react-router-dom";
+import { Navigate } from "@tanstack/react-router";
 
 const Index = () => {
-  return <Navigate to={ERouter.LOGIN} replace />;
+  return <Navigate to={`${ERouter.LOGIN}`} replace />;
 };
 
 export default Index;

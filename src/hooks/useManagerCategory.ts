@@ -1,26 +1,26 @@
-import { getAllCategories } from "@/services/categoryService";
-import { ICategory } from "@/types/category";
-import { useEffect, useState } from "react";
+import { EPage } from "@/enums/enums";
+import { createCategoryService, getAllCategories } from "@/services/categoryService";
+import { useQueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 export const useManagerCategory = () => {
-    const [categories, setCategories] = useState<ICategory[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
+    const queryClient = useQueryClient();
+    const [page, setPage] = useState(EPage.DEFAULT);
+    const [limit, setLimit] = useState(EPage.LIMIT);
+    const [sortBy, setSortBy] = useState(EPage.SORT_BY);
+    const [sortOrder, setSortOrder] = useState(EPage.SORT_ORDER);
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const data = await getAllCategories();
-                if (data) {
-                    setCategories(data);
-                }
-            } catch (error) {
-                console.error("Error fetching categories:", error);
-            } finally {
-                setIsLoading(false);
-            }
+    const { data: categories = [], isLoading } = useQuery({
+        queryKey: ['categories', page, limit, sortBy, sortOrder],
+        queryFn: () => getAllCategories(page.toString(), limit.toString(), sortBy.toString(), sortOrder.toString()),
+    });
+
+    const createCategoryMutation = useMutation({
+        mutationFn: createCategoryService,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['categories'] })
         }
-        fetchCategories();
-    }, [])
+    })
 
-    return { categories, isLoading };
+    return { categories, isLoading, createCategoryMutation };
 }

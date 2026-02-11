@@ -1,9 +1,9 @@
-import { useParams } from "react-router-dom";
+import { useParams } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Plus, Pencil, Trash2, AlertTriangle, X } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateUserFormValues, createUserSchema } from "@/schema/userSchema";
+import { CreateUserFormValues, createUserSchema } from "@/schemas/userSchema";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/admin/PageHeader";
@@ -29,13 +29,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useManagerUsers } from "@/hooks/useManagerUsers";
-import { ICreateUserRequest, IUser } from "@/types/user";
+import { IUserRequest, IUser } from "@/types/user";
 import { generatePassword } from "@/utils/genPassword";
-import { updateUserService } from "@/services/userService";
+
+import { PaginationPage } from "@/components/admin/Pagination";
 
 export default function UserManagement() {
-  const { userId } = useParams();
-  const { users, loading, createUser, getUserById, updateUser, deleteUser } = useManagerUsers();
+  const { userId } = useParams({ strict: false });
+  const { users, loading, page, setPage, createUser, getUserById, updateUser, deleteUser } = useManagerUsers();
   const [searchQuery, setSearchQuery] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -79,7 +80,7 @@ export default function UserManagement() {
   const onSubmit = async (data: CreateUserFormValues) => {
     try {
       if (selectedUser) {
-        const result = await updateUser(selectedUser.id, data as ICreateUserRequest);
+        const result = await updateUser(selectedUser.id, data as IUserRequest);
         if (result) {
           toast.success("User updated successfully");
           setIsDialogOpen(false);
@@ -88,7 +89,7 @@ export default function UserManagement() {
           toast.error("Failed to update user");
         }
       } else {
-        const result = await createUser(data as ICreateUserRequest);
+        const result = await createUser({ userData: data as IUserRequest });
         if (result) {
           toast.success("User created successfully");
           setIsDialogOpen(false);
@@ -234,6 +235,12 @@ export default function UserManagement() {
         data={filteredUsers}
         keyExtractor={(user) => user.id}
         emptyMessage="No users found"
+      />
+
+      <PaginationPage
+        currentPage={page}
+        totalPages={5}
+        onPageChange={(newPage) => setPage(newPage)}
       />
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

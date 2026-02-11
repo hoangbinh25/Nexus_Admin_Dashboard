@@ -8,7 +8,7 @@ export interface IUser {
     createdAt: string;
 }
 
-export interface ICreateUserRequest {
+export interface IUserRequest {
     fullName?: string;
     email?: string;
     password?: string;

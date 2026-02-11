@@ -1,9 +1,16 @@
 import { IProduct } from "@/types/product";
 import api from "./api"
 
-export const getAllProducts = async (): Promise<IProduct[]> => {
+export const getAllProducts = async (page: string, limit: string, sortBy: string, sortOrder: string): Promise<IProduct[]> => {
     try {
-        const res = await api.get("/products");
+        const res = await api.get(`/products`, {
+            params: {
+                page,
+                limit,
+                sortBy,
+                sortOrder,
+            }
+        });
         console.log("API Products Response:", res);
 
         if (Array.isArray(res.data)) {

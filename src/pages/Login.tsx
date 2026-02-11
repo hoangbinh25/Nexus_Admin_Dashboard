@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +32,7 @@ export default function Login() {
         description: "Welcome back to Nexus Admin!",
         variant: "default",
       });
-      navigate(ERouter.DASHBOARD_OVERVIEW);
+      navigate({ to: `${ERouter.DASHBOARD_OVERVIEW}` });
     } else {
       toast({
         title: "Login failed",

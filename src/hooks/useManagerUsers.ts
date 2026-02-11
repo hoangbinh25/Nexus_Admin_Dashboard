@@ -1,3 +1,4 @@
+import { EPage } from "@/enums/enums";
 import {
     createUserService,
     getAllUsers,
@@ -5,74 +6,65 @@ import {
     updateUserService,
     deleteUserService
 } from "@/services/userService";
-import { ICreateUserRequest, IUser } from "@/types/user";
-import { useCallback, useEffect, useState } from "react";
+import { IUserRequest } from "@/types/user";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 export const useManagerUsers = () => {
-    const [users, setUsers] = useState<IUser[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [page, setPage] = useState(1);
-    const [limit, setLimit] = useState(20);
-    const fetchUsers = useCallback(async () => {
-        setLoading(true);
-        const fetchedUsers = await getAllUsers(page.toString(), limit.toString(), "createdAt", "DESC");
-        // console.log("Hook fetched users:", fetchedUsers);
-        setUsers(fetchedUsers);
-        setLoading(false);
-    }, [page, limit]);
+    const queryClient = useQueryClient();
+    const [page, setPage] = useState<number>(EPage.DEFAULT);
+    const [limit, setLimit] = useState(EPage.LIMIT);
+    const [sortBy, setSortBy] = useState(EPage.SORT_BY);
+    const [sortOrder, setSortOrder] = useState(EPage.SORT_ORDER);
 
-    useEffect(() => {
-        fetchUsers();
-    }, [fetchUsers, page, limit]);
+    const { data: users = [], isLoading: loading, refetch } = useQuery({
+        queryKey: ['users', page, limit, sortBy, sortOrder],
+        queryFn: () => getAllUsers(page.toString(), limit.toString(), sortBy.toString(), sortOrder.toString()),
+    });
 
-    const getUserById = useCallback(async (userId: string) => {
-        setLoading(true);
+    const createUserMutation = useMutation({
+        mutationFn: ({ userData }: { userData: IUserRequest }) => createUserService(userData),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        },
+    });
+
+    const updateUserMutation = useMutation({
+        mutationFn: ({ userId, userData }: { userId: string, userData: IUserRequest }) =>
+            updateUserService(userId, userData),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        },
+    });
+
+    const deleteUserMutation = useMutation({
+        mutationFn: deleteUserService,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['users'] });
+        },
+    });
+
+    const getUserById = async (userId: string) => {
         try {
-            const result = await getUserByIdService(userId);
-            return result;
+            return await getUserByIdService(userId);
         } catch (error) {
             console.error("Get user by ID error:", error);
             return null;
-        } finally {
-            setLoading(false);
         }
-    }, []);
+    };
 
-    const createUser = useCallback(async (userData: ICreateUserRequest) => {
-        setLoading(true);
-        try {
-            const result = await createUserService(userData);
-            await fetchUsers();
-            return result;
-        } catch (error) {
-            console.error("Create user error:", error);
-            return null;
-        } finally {
-            setLoading(false);
-        }
-    }, [fetchUsers]);
-
-    const updateUser = useCallback(async (userId: string, userData: ICreateUserRequest) => {
-        setLoading(true);
-        try {
-            const result = await updateUserService(userId, userData);
-            await fetchUsers();
-            return result;
-        } finally {
-            setLoading(false);
-        }
-    }, [fetchUsers]);
-
-    const deleteUser = useCallback(async (userId: string) => {
-        setLoading(true);
-        try {
-            const result = await deleteUserService(userId);
-            await fetchUsers();
-            return result;
-        } finally {
-            setLoading(false);
-        }
-    }, [fetchUsers]);
-
-    return { users, loading, fetchUsers, getUserById, createUser, updateUser, deleteUser };
+    return {
+        users,
+        loading,
+        page,
+        setPage,
+        limit,
+        setLimit,
+        fetchUsers: refetch,
+        getUserById,
+        createUser: createUserMutation.mutateAsync,
+        updateUser: (userId: string, userData: IUserRequest) =>
+            updateUserMutation.mutateAsync({ userId, userData }),
+        deleteUser: deleteUserMutation.mutateAsync
+    };
 }

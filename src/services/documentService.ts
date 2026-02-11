@@ -1,9 +1,16 @@
 import { IDocument } from "@/types/document";
 import api from "./api";
 
-export const getAllDocuments = async (): Promise<IDocument[]> => {
+export const getAllDocuments = async (page: string, limit: string, sortBy: string, sortOrder: string): Promise<IDocument[]> => {
     try {
-        const res = await api.get("/documents");
+        const res = await api.get(`/documents`, {
+            params: {
+                page,
+                limit,
+                sortBy,
+                sortOrder,
+            }
+        });
         console.log("Documents API Response:", res.data);
 
         if (Array.isArray(res.data)) {

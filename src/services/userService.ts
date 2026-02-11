@@ -1,9 +1,9 @@
-import { ICreateUserRequest, IUser } from "@/types/user";
+import { IUser, IUserRequest } from "@/types/user";
 import api from "./api"
 
 export const getAllUsers = async (page: string, limit: string, sortBy: string, sortOrder: string): Promise<IUser[]> => {
     try {
-        const res = await api.get("/users", {
+        const res = await api.get(`/users`, {
             params: {
                 page,
                 limit,
@@ -11,7 +11,7 @@ export const getAllUsers = async (page: string, limit: string, sortBy: string, s
                 sortOrder,
             }
         });
-        console.log("API Users Response:", res.data);
+        // console.log("API Users Response:", res.data);
 
         if (Array.isArray(res.data)) {
             return res.data;
@@ -30,7 +30,7 @@ export const getAllUsers = async (page: string, limit: string, sortBy: string, s
     }
 }
 
-export const getUserByIdService = async (userId: string): Promise<IUser> => {
+export const getUserByIdService = async (userId: string): Promise<IUser | null> => {
     try {
         const res = await api.get<IUser>(`/users/${userId}`);
         // console.log("User by ID: ", res.data)
@@ -41,9 +41,9 @@ export const getUserByIdService = async (userId: string): Promise<IUser> => {
     }
 }
 
-export const createUserService = async (userData: ICreateUserRequest) => {
+export const createUserService = async (userData: IUserRequest) => {
     try {
-        const res = await api.post<ICreateUserRequest>("/users", userData);
+        const res = await api.post<IUserRequest>("/users", userData);
         return res.data;
     } catch (error) {
         console.error("Create user error:", error);
@@ -51,9 +51,9 @@ export const createUserService = async (userData: ICreateUserRequest) => {
     }
 }
 
-export const updateUserService = async (userId: string, userData: ICreateUserRequest) => {
+export const updateUserService = async (userId: string, userData: IUserRequest) => {
     try {
-        const res = await api.put<ICreateUserRequest>(`/users/${userId}`, userData);
+        const res = await api.put<IUserRequest>(`/users/${userId}`, userData);
         return res.data;
     } catch (error) {
         console.error("Update user error:", error);
@@ -63,7 +63,7 @@ export const updateUserService = async (userId: string, userData: ICreateUserReq
 
 export const deleteUserService = async (userId: string) => {
     try {
-        const res = await api.delete<ICreateUserRequest>(`/user/${userId}`);
+        const res = await api.delete<IUserRequest>(`/user/${userId}`);
         return res.data;
     } catch (error) {
         console.error("Delete user error:", error);

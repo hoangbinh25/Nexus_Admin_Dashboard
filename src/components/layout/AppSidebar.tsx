@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, useLocation } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import {
   LayoutGrid,
@@ -14,13 +14,13 @@ import { ERouter } from "@/enums/route";
 import { useAuth } from "@/context/AuthContext";
 
 const menuItems = [
-  { title: "Overview", url: ERouter.DASHBOARD_OVERVIEW, icon: LayoutGrid },
-  { title: "User Management", url: ERouter.DASHBOARD_USERS, icon: Users },
-  { title: "Category Management", url: ERouter.DASHBOARD_CATEGORIES, icon: Layers },
-  { title: "Product Management", url: ERouter.DASHBOARD_PRODUCTS, icon: Box },
-  { title: "Document Management", url: ERouter.DASHBOARD_DOCUMENTS, icon: FileText },
-  { title: "Content Pages", url: ERouter.DASHBOARD_CONTENT_PAGES, icon: Files },
-  { title: "Settings", url: ERouter.DASHBOARD_SETTINGS, icon: Settings },
+  { title: "Overview", url: `${ERouter.DASHBOARD_OVERVIEW}`, icon: LayoutGrid },
+  { title: "User Management", url: `${ERouter.DASHBOARD_USERS}`, icon: Users },
+  { title: "Category Management", url: `${ERouter.DASHBOARD_CATEGORIES}`, icon: Layers },
+  { title: "Product Management", url: `${ERouter.DASHBOARD_PRODUCTS}`, icon: Box },
+  { title: "Document Management", url: `${ERouter.DASHBOARD_DOCUMENTS}`, icon: FileText },
+  { title: "Content Pages", url: `${ERouter.DASHBOARD_CONTENT_PAGES}`, icon: Files },
+  { title: "Settings", url: `${ERouter.DASHBOARD_SETTINGS}`, icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -44,21 +44,22 @@ export function AppSidebar() {
             const isActive = location.pathname === item.url;
             return (
               <li key={item.url}>
-                <NavLink
+                <Link
                   to={item.url}
-                  className={cn(
-                    "flex items-center gap-3 px-4 py-3 rounded-xl text-lg font-medium transition-all duration-200",
-                    isActive
-                      ? "bg-[#EEF2FF] text-[#4F46E5]"
-                      : "text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]"
-                  )}
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-lg font-medium transition-all duration-200"
+                  activeProps={{ className: "bg-[#EEF2FF] text-[#4F46E5]" }}
+                  inactiveProps={{ className: "text-[#64748B] hover:bg-slate-50 hover:text-[#0F172A]" }}
                 >
-                  <item.icon className={cn(
-                    "h-6 w-6 shrink-0",
-                    isActive ? "text-[#4F46E5]" : "text-[#64748B]"
-                  )} />
-                  {item.title}
-                </NavLink>
+                  {({ isActive }) => (
+                    <>
+                      <item.icon className={cn(
+                        "h-6 w-6 shrink-0",
+                        isActive ? "text-[#4F46E5]" : "text-[#64748B]"
+                      )} />
+                      {item.title}
+                    </>
+                  )}
+                </Link>
               </li>
             );
           })}

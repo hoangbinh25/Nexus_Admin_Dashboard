@@ -1,9 +1,16 @@
 import { IPage } from "@/types/page";
 import api from "./api";
 
-export const getAllPage = async (): Promise<IPage[]> => {
+export const getAllPage = async (page: string, limit: string, sortBy: string, sortOrder: string): Promise<IPage[]> => {
     try {
-        const res = await api.get("/pages");
+        const res = await api.get(`/pages`, {
+            params: {
+                page,
+                limit,
+                sortBy,
+                sortOrder,
+            }
+        });
         console.log("Pages API Response:", res);
 
         if (Array.isArray(res)) {

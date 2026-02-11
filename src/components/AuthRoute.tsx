@@ -1,6 +1,6 @@
 import { useAuth } from "@/context/AuthContext"
 import { ERouter } from "@/enums/route";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "@tanstack/react-router";
 
 export const AuthRoute = () => {
     const { isAuthenticated, isLoading } = useAuth();
